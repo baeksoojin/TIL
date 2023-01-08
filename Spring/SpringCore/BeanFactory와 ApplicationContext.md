@@ -27,6 +27,12 @@ void findBeanByType(){
 ## BeanFactory와 ApplicationContext의 차이점
 
 - ApplicationContext는 스프링 빈 조회 기능뿐만 아니라 다른 여러 기능을 포함한다.
+
+```
+public interface ApplicationContext extends EnvironmentCapable,         ListableBeanFactory, HierarchicalBeanFactory,
+MessageSource, ApplicationEventPublisher, ResourcePatternResolver {~~
+```
+
 1. interface MessageSource<br>
 한국에서 들어온면 한국어로 영어권에서 들어오면 영어로 출력
 2. EnvironmentCapable<br>
