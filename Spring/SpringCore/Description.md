@@ -7,4 +7,4 @@
 그러기 위해서, 순수 java 코드를 통해서 애플리케이션을 생성해보고 왜 spring이 탄생하게 된건지 알아봅니다.
 
 2. Spring 핵심 개념에 대해서 정리합니다.<br>
-SpringBoot를 적용한 Code 작성 방법, Test 방법 등을 알아봅니다.
+Spring를 적용한 Code 작성 방법, Test 방법 등을 알아봅니다.
