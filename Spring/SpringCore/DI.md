@@ -197,4 +197,25 @@ java8을 활용해 Optional을 사용한다면 Optional.empty 즉 Bean이 없어
 
    ** 따라서 프레임워크에 의존하지 않고 순수한 자바 언어의 특징을 잘 살리는 방법이기도 하다. 따라서 위와같은 장점을 누리기 위해, 무조건 생성자 주입을 사용하자!!**
 
+------
 
+## 롬복과 최신 트랜드
+
+생성자를 통한 DI는 다 좋은데 코드가 길어진다는 불편함이 존재했다. 하지만 Lombok을 통해서 코드를 줄일 수 있다!<br>
+
+- **RequiredArgsConstructor**
+    final이 붙은 parameter를 가지고 생성자를 자동으로 생성해준다.<br>
+    가끔 생성자가 실제로 필요한 경우만 직접 만들어주고 나머지는 해당 lombok제공 annotation을 사용한다.<br>
+
+```
+@Component
+@RequiredArgsConstructor
+public class OrderServiceImpl implements  OrderService{
+
+    private final MemberRepository memberRepository; //interface에만 의존하고 구체화에는 의존하지 않도록 DIP 원칙을 가져감
+    private final DiscountPolicy discountPolicy; //interface에만 의존하고 구체화에는 의존하지 않도록 DIP 원칙을 가져감
+}
+```
+생성자주입의 최종코드는 다음과 같다<br>
+
+최근에는 생성자를 1개만 두고 @Autowired를 생략하는 방법을 사용하고, RequiredArgsConstructor를 여러개일때 사용한다.<br>
