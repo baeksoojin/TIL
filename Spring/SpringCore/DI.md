@@ -162,3 +162,39 @@ java8을 활용해 Optional을 사용한다면 Optional.empty 즉 Bean이 없어
 
 ------
 
+## 생성자 주입을 선택하자
+
+### 왜 생성자 주입을 권장하나? [why]
+
+대부분의 의존관계 주입은 처음에 조립할 때 거의 다 정해진다. 실제로 의존관계가 대부분 변경가능성이 거의 없어야하기 때문이다.
+
+1. **불변의 원칙**
+    - 누군가 실수로 변경이 가능하도록 변경 메서드를 열어두지 않아야한다.
+2. **누락체크**
+
+    Test할때의 누락<br>
+
+    - 만약에 setter를 활용한 수정자 주입을 할 때의 TEST<br>
+    ```
+        class OrderServiceImplTest {
+
+        @Test
+        void CreateOrder(){
+            OrderServiceImpl orderService = new OrderServiceImpl();
+            orderService.createOrder(1L,"itema",10000);
+        }
+
+        }
+    ```
+
+    createOrder에서는 member와 discountpolicy의 repository가 필요하지만 setter를 사용하지 않아서 의존관계 주입이 되어있지 않아, null point exception이 나오게 된다.<br>
+    이렇게 단위테스트를 진행하게 될때 setter주입이 되어있다면 오류를 발견하고 createOrder의 코드를 확인하기 위해서 orderServiceImple로 넘어가게된다.<br>
+    이 과정은 개발자가 testcode 작성을 할때 귀찮은 과정을 반복하게 만든다.<br>
+
+    - 생성자 주입을 통해서 짜놓은 code로 TEST
+    ` OrderServiceImpl orderService = new OrderServiceImpl(); `를 진행하는 순간 빨간줄이 뜨면서 개발자가 생성자에 의존관계 주입이 되지 않았음을 바로 알아차릴 수 있다.<br>
+    `final`을 통해서 실수로 생성자에 의존관계 주입을 누락할 경우, 컴파일 오류가 발생되어 바로 알아챌 수 있다.<br>
+
+   ** 따라서 프레임워크에 의존하지 않고 순수한 자바 언어의 특징을 잘 살리는 방법이기도 하다. 따라서 위와같은 장점을 누리기 위해, 무조건 생성자 주입을 사용하자!!**
+
+
