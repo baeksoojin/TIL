@@ -49,6 +49,31 @@ public OrderServiceImpl(MemberRepository memberRepository, @Qualifier("mainDisco
 }
 ```
 
+- annotation을 직접 만들어서 컴파일 관리하기
+이때, 문자는 컴파일 오류에 잡히지 않아서 실수로 이름을 잘못적었을 경우, 어디서 오류가 났는지 알 수가 없음. <br>
+컴파일 타입에서 오류가 날 수 있도록 annotation을 생성한다.<br>
+
+~~~
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+@Qualifier("mainDiscountPolicy")
+public @interface MainDiscountPolicy {
+}
+
+~~~
+1~4번까지의 annotation은 @Qualifier에 붙어있는 anntation들인데 복사해서 붙여넣으면 된다.<br>
+그리고 이름을 붙이기 위해서 @Qualifier("name")
+이렇게 사용하면 된다.<br>
+이때 mainDiscountPolicy라는 string은 다른데서 불러서 사용하지 않고 annotation이름인 MainDiscountPolicy를 사용하는 것이기에 annotation이름이 잘못되었다면 컴파일 단위로 오류처리가된다는 장점이 있다.<br>
+
+~~~
+@Component
+@MainDiscountPolicy //compile error check 위해서 직접 annotation 생성
+public class RateDiscountPolicy implements DiscountPolicy{}
+~~~
+
 ### @Primary
 
 ```
