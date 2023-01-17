@@ -88,3 +88,33 @@ public class RateDiscountPolicy implements DiscountPolicy{
 ### 우선순위
 
 primary 보다는 qaulifier가 더 상세히 적힌 것이기에 우선순위가 더 높다.<br>
+
+### 조회한 빈이 모두 필요할 때 
+
+**Map, List**를 사용할 수 있다.<br>
+```
+ static class DiscountService {
+        private final Map<String, DiscountPolicy> policyMap;
+        private final List<DiscountPolicy> policies;
+
+        @Autowired
+        public DiscountService(Map<String, DiscountPolicy> policyMap, List<DiscountPolicy> policies){
+            this.policyMap = policyMap;
+            this.policies = policies;
+
+            System.out.println("policeMap"+policyMap);
+            System.out.println("policies"+policies);
+        }
+
+
+        public int discount(Member member, int price, String discountCode) {
+            DiscountPolicy discountPolicy = policyMap.get(discountCode);
+            return discountPolicy.discount(member, price);
+        }
+    }
+```
+
+service의 코드를 다음과 같이 바꿀 수 있다.<br>
+Map,List를 통해서 여러개의 구현체를 받아서 선택적으로 사용할 수 있다.<br>
+**동적으로 Bean을 변경하며 사용해야할 때** 사용하면 다형성을 유지하면서도 편리하게 사용이 가능하다.<br>
+
