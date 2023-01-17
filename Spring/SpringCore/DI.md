@@ -122,3 +122,43 @@ init이라는 아무 method를 통해서 의존관계를 주입시키는 방법�
 
 ----
 
+## Autowired의 option처리
+
+Autowired annotation의 기본 옵션은 required = True이다. <br>
+즉, 주입할 대상이 스프링 빈에 등록되어있지 않은 경우 error가 발생한다<br>
+만약 주입할 대상이 없어도 동작하게끔 하기 위해서는 어떻게 해야하나? @Autowired의 option처리에 대해서 알아보자!<br>
+
+### required = false
+```
+@Autowired(required = false)
+public void setNoBean1(Member noBean1) {
+    System.out.println("noBean1" + noBean1);
+}
+```
+다음과 같이 testcode에 작성을 한 후에 method가 정의된 class를 container에 넣어준다면? Bean1이 등록되어있지 않지만 error를 반환하지 않는다<br>
+` required = false `를 통해서 주입할 대상이 null이라면 해당 method 자체를 호출하지 않는다.<br>
+따라서 log값이 터미널에 아예 찍히지 않는다.<br>
+
+### @Nullable
+~~~
+@Autowired
+public void setNoBean2(@Nullable Member noBean2) {
+    System.out.println("noBean2 " + noBean2);
+}
+
+~~~
+@Nullable을 사용한다면 springbean에 등록되어 있지 않아 null 이지만, 호출은 된다<br>
+따라서 log값이 "noBean2 null"로 찍힌다<br>
+
+### Optional
+```
+@Autowired
+public void setNoBean3(Optional<Member> noBean3){
+    System.out.println("noBean3 " + noBean3);
+}
+```
+java8을 활용해 Optional을 사용한다면 Optional.empty 즉 Bean이 없어도 가능하고 이 역시 호출된다.<br>
+따라서 log값이 "noBean3 Optional.empty"으로 찍힌다<br>
+
+------
+
