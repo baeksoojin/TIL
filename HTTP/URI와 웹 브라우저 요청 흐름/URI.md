@@ -1,6 +1,6 @@
 # URI
 
-> URI란 Uniform Resource Identitier로 resource 식별을 위한 종합된 방법이다.
+> URI란 Uniform Resource Identifier로 resource 식별을 위한 종합된 방법이다.
 
 URI는 Locator, Name 또는 둘다 추가로 분류된다.<br>
 URI안에 Locator를 통해서 식별하는 방법 URL과 Name을 통해서 식별하는 URN이 존재한다.<br>
