@@ -38,6 +38,40 @@ controller는 뷰의 논리 이름을 반환하고 실제 물리 위치의 이�
 - `request.setAttribute()`를 사용해서 데이터를 저장하고 뷰에 전달하였다.<br>
 - 서블릿의 종속성을 제거하기 위해서 Model을 직접 만들고 View 이름까지 전달하는 객체를 만들어보자!
 
+뷴리해서 사용하는 코드)<br>
+
+우선 ModelView를 만들어보면.<br>
+```
+
+public class ModelView {
+
+    private String ViewName; //view의 논리적인 이름만 가져오고
+    private Map<String, Object> model = new HashMap<>();
+
+    public ModelView(String viewName) {
+        ViewName = viewName;
+    }
+
+    public String getViewName() {
+        return ViewName;
+    }
+
+    public void setViewName(String viewName) {
+        ViewName = viewName;
+    }
+
+    public Map<String, Object> getModel() {
+        return model;
+    }
+
+    public void setModel(Map<String, Object> model) {
+        this.model = model;
+    }
+}
+
+```
+ViewName을 통해서 실제로 물리적인 Object를 반환하는 
+
 ```
 @WebServlet(name="frontControllerServletV3", urlPatterns = "/front-controller/v3/*")
 public class FrontControllerServletV3 extends HttpServlet {
