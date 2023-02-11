@@ -57,7 +57,7 @@ springMVC는 HttpEntity parameter를 지원한다.<br>
 메시지 바디 정보 직접 반환<br>
 view 조회를 하지 않고 응답 메시지를 바로 넣어버리는 로직으로 처리된다.<br>
 
-- ResponseEntity
+- RequestEntity
 
 만약에 **상태코드를 넣고 싶다면** `RequestEntity`를 사용하여 `return new ResponseEntity<String>("message",HttpStatus.CREATED);`등과 같이 사용할 수 있다.<br>
 
