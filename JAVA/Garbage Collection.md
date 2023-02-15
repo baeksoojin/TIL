@@ -13,7 +13,7 @@ memory fragementation은 연속으로 저장되지 않고 쪼개져서(흩어져
 <img width="688" alt="image" src="https://user-images.githubusercontent.com/74058047/219024791-3fef7413-faca-4283-88f4-a034852dede9.png">
 
 
-이때,cache memory는 CPU에서 매우 빠르게 동작하며 비싸지만 이것을 unless data로 사용하게 되는 것이다. <br>
+이때,cache memory는 CPU에서 매우 빠르게 동작하며 비싸지만 이것을 unuseless data로 사용하게 되는 것이다. <br>
 따라서 메모리 조각화의 문제점을 해결하기 위해서 java는 특히 성능이 매우 좋은 가비지 수집기(GC)가 필요한 것이다.<br>
 <br>
 
