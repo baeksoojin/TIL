@@ -13,16 +13,7 @@
     - src/main/resources 안의 <span style="font-size:17px; background-color : blue; color:white;">static 하위의 자원은 내장 톰켓에 의해서 자동으로 서빙을 해준다.</span>
     - 예를 들어보자.<br>
     `src/main/resources/static/basic/hello-form.html`을 경로로하는 정적 리소스를 만들었다면 <span style="background-color : blue; color:white;">static 하위의 폴더의 경로부터 url에 넣어주면 static file을 server가 응답한다.</span><br>
-    ```
-    @RequestMapping("response-view-v1")
-    public ModelAndView responseViewV1(){
-        ModelAndView mav = new ModelAndView("response/hello")
-                .addObject("data","hello!");
-        return mav;
-    }
-    ```
-    controller가 다음과 같을 때,<br>
-
+  
     ![image](https://user-images.githubusercontent.com/74058047/218153953-3fa0582f-70cc-4fc4-906e-efa027307cb3.png)
     <br>해당 이미지처럼 경로가 설정되어있다면<br>
     <br>
