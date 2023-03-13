@@ -77,14 +77,14 @@ interrupt를 통해서 운영체제의 프로세스가 동작하는데 이를 in
 
 ##  **interrupt driven**
     
-    interrupt를 여러종류(어떤 경우에는 harddisk쪽, 어떤 경우에는 monitor쪽)가 있을 수 있을 때, 각 interrupt마다 처리해주는 방법이 다른데 어디에 해당 처리 프로그램을 가지고 있냐(주소)에 대한 정보는 **interrupt vector**라고한다. (어떤 유형의 인터럽트인지 파악하는 단계)
-    
-    interrupt가 걸린 시점을 save해서 처리 이후 다시 하던작업을 실행한다.(인터럽트 처리이전 기존의 처리과정 저장하는 단계)
-    
-    interrupt를 처리하던 중에 interrupt가 새롭게 발생할 경우, “우선순위”를 비교하여 다 끝나지 않더라도 우선순위가 큰 것부터 처리한다.(실행하는 단계에 발생가능)
-    
-    - trap : software적으로 발생한 에러를 처리할 수 있도록 신호를 줄때도 사용한다. 혹은 의도적으로 필요해서 system call 을 활용하기 위해서 발생시킴.
-    - 운영체제의 작업은 “interrupt”에 의해서 동작한다. = **interrupt** **Driven**
+interrupt를 여러종류(어떤 경우에는 harddisk쪽, 어떤 경우에는 monitor쪽)가 있을 수 있을 때, 각 interrupt마다 처리해주는 방법이 다른데 어디에 해당 처리 프로그램을 가지고 있냐(주소)에 대한 정보는 **interrupt vector**라고한다. (어떤 유형의 인터럽트인지 파악하는 단계)
+
+interrupt가 걸린 시점을 save해서 처리 이후 다시 하던작업을 실행한다.(인터럽트 처리이전 기존의 처리과정 저장하는 단계)
+
+interrupt를 처리하던 중에 interrupt가 새롭게 발생할 경우, “우선순위”를 비교하여 다 끝나지 않더라도 우선순위가 큰 것부터 처리한다.(실행하는 단계에 발생가능)
+
+- trap : software적으로 발생한 에러를 처리할 수 있도록 신호를 줄때도 사용한다. 혹은 의도적으로 필요해서 system call 을 활용하기 위해서 발생시킴.
+- 운영체제의 작업은 “interrupt”에 의해서 동작한다. = **interrupt** **Driven**
 
 ## interrupt handling
 - interrupt가 발생하면 가장 먼저 하던 작업의 데이터들을 저장하고(각종 register값이나 program counter값을 저장)
@@ -120,7 +120,7 @@ interrupt를 통해서 운영체제의 프로세스가 동작하는데 이를 in
         system call
         
         device-status table를 둬서 각각의 io device들이 놀고있는지 바쁜지 혹은 줄서있는지 관리해주는 table.
-        
+            
     
 - device-status table
         
