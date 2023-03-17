@@ -304,15 +304,13 @@ public void **update**(Long itemId, ItemUpdateDto updateParam) {
 > 
 
 ```java
-public **interface** ItemRepository extends JpaRepository<Member, Long> {
+public interface ItemRepository extends JpaRepository<Member, Long> {
  }
 ```
 
 구현체는 spring data JPA가 프록시 기술을 사용해서 구현 클래스를 생성해준다.
 
 proxy를 구현 class로 springbean에 등록.
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bc7e3b52-1926-43f8-8a7e-18ac0e36da48/Untitled.png)
 
 **따라서 개발자는 구현없이 interface만 생성해서 curd를 할 수 있다.**
 
@@ -458,4 +456,4 @@ DI,OCP를 지키기 위해서 어댑터를 도입하고 더 많은 코드를 유
 
 - 내부의 롤백
 
-전체가 다 롤백되어야한다. 내부는 신규 트랜잭션이 아니여서 **`rollbackOnly**=true`로 marking만 가능하다. 따라서 트랜잭션 동기화 매니저는 외부 트랜잭션이 커밋되어도 rollback을 진행한다
+전체가 다 롤백되어야한다. 내부는 신규 트랜잭션이 아니여서 `rollbackOnly =true`로 marking만 가능하다. 따라서 트랜잭션 동기화 매니저는 외부 트랜잭션이 커밋되어도 rollback을 진행한다
