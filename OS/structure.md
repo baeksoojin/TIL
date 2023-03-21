@@ -104,6 +104,9 @@ number로 system call의 흐름을 제어
 
 어떤 API 형식에 맞춰서 어떤 특별한 function이나 instruction을 호출할 수 있는지 그리고 그 결과로 어떤 결과가 넘어오는지 체크
 
+----
+
+
 **Parameter Passing**
 
 - Register
@@ -119,6 +122,8 @@ parameter를 push → 읽을때 pop
 - Memory
 
 일부분을 block 으로 잡아서 사용하면 일부 유동적으로 사이즈를 변화시킬 수 있음.
+
+---
 
 **Types of System Call**
 
@@ -143,3 +148,190 @@ parameter를 push → 읽을때 pop
 - Communication
     
     create, delete communication connection
+
+---
+
+## system programs
+
+> some of them are simply user interfaace to system call
+> 
+
+- status imformation
+
+registry : 사태정보를 저장하기 위한 레지스터들의 묶음
+
+status : date, time, amount of available
+memory, disk space, number of users
+
+- file modification
+    - text editors : text editor, to search contents of files
+    - programming-language : compiler(한번에 기계어로 번역했을 경우를 컴파일러라고함 - high level language), assemblers( low level language를 기계어로 번역), interpreters(한줄한줄 번역)
+    - loading : memory로 실행시키기 위해서 가지고 올라오는 것.
+        
+        절대 로더 : 한번 메모리로 가지고 오면 메모리 위치가 변화하지 않는다.
+        
+        relocatable loader : memory 위치가 변화할 수 있음
+        
+        overlay-loader : memory위로 올려주는 로더이지만 중첩기능이 포함되어있는 메모리 로더. 프로세스 하나가 사용중인 메모리를 다른 프로세스가 특정 빈 부분을 비었을 때 사용이 가능하다.
+        
+    - communication : 한 사용자가 다른 사용자에게 메시지나 이메일을 보내는 것. 원격 로그인 등
+
+--- 
+
+## system design
+
+운영체제의 디자인 및 구조.
+
+초기에 운영체제가 어떻게 나왔는지에 대한 내용. 사실상 내부구조는 운영체제에 따라서 다르지만 설계하려는 목적에 대해서 알아봄.
+
+- 사용자의 목표와 시스템의 목표를 분리해서 생각
+    - user goal : convenient to use, easy to learn, reliable, safe, and fast
+    - system goal : 관리하기 쉬워야하고 디자인하기 쉬워야하고 신뢰성과 효율성을 지켜야한다. 에러가 없어야한다.
+- policy와 mechanism을 확실하게 구분해서 설계
+    - what : 무엇을 (이후에 변경이 가능)
+    - mechanism : 어떻게
+    
+    policy는 바뀔 수 있는데 그것에 맞는 메거니즘만 준비해놓으면 이후 변경이 되었을 때 대처할 수 없음. 따라서, policy, mechanism을 분리해서 설계해서 모든 가능성을 열어둬야한다.
+    
+
+---
+
+## system structure
+
+- MS-DOS : disk operating system
+
+main memory의 크기가 커봤자 614k였어서 제약사항이 많았음.
+
+![image](https://user-images.githubusercontent.com/74058047/226505702-c5e2f930-7c39-4aa1-a146-5044758ace3b.png)
+
+ROM BIOS(basic input output system)가 가장 마지막
+
+**특징**
+
+application program에서 단계를 다 거쳐서 ROM BIOS를 접근하다보면 memory가 가득 차서 문제점이 발생할 수 있다.
+
+그래서, 바로 이동하게끔 하였다.
+
+하지만, 잘 분리되어있다고 말할 수 없는 모델이다.
+
+- layerd approach
+
+![image](https://user-images.githubusercontent.com/74058047/226505743-625d0aab-aac1-4ff1-90a9-7d0a81f19d46.png)
+
+layer별로 나눠서 구분.
+
+위로 올라갈수록 기능이 커짐.
+
+참고로) filer manager가 n-1의 layer에 있어서 UI에서 오는 system call을 동작.
+
+**특징**
+
+layer i에서는 0~i-1의 layer의 기능을 사용할 수 있지만, 역으로는 불가능하다.(아래로는 접근이 가능하지만 위로는 불가능)
+
+따라서, 기능배정이 중요해지고 만약 기능배정을 잘못해서 file manager를 하단에 배치하면 device driver를 작동할 수 없기에 배치를 중요하게 고려해야한다.
+
+- UNIX의 등장
+
+![image](https://user-images.githubusercontent.com/74058047/226505805-027b5cf6-9f07-4114-a801-5eb19831e572.png)
+
+**특징**
+
+Kernel : 물리적인 계층의 위에 존재하고 system call interface 아래에 존재하게 된다.
+
+kernel이 굉장히 많은 특징을 가지고 있다. 하나를 변경하기 위해서는 연관된 다른것들을 다 수정해야한다는 단점이존재한다.
+
+따라서, system program과 kernel 두가지로만 분리되어있어서 발생가능한 단점을 극복한게 Microkernel System Structure
+
+- Microkernel
+
+![image](https://user-images.githubusercontent.com/74058047/226505812-cca2c2be-9259-4e71-b6c3-186f675c7f16.png)
+
+**특징**
+
+core : 경량화 되어있다.
+
+⇒ 핵심적인 기능은 밖으로 (kernel밖)으로 빼졌다.
+
+⇒ kernel과 외부의 모듈이 communication을 message passing으로 이루어지게 된다.
+
+object-oriented approach
+
+separate
+
+message passing을 통한 커뮤니케이션(각 모듈끼리)
+
+필요할때마다 메모리로 로딩시키고 다 사용하면 내려보내준다.
+
+**장점**
+
+extend가 쉬움, port가 쉬움, reliable(커널에서 돌고있는게 적다보면 그 안에 들어갈 에러가 줄어들어서 신뢰도가 커짐), secure(커널에서 돌고있는게 적다보면 그 안에 들어갈 에러가 줄어들어서 안전성이 커짐)
+
+**단점** 
+
+message passing과정에서의 overhead가 발생할 수 있음
+
+**비교**
+
+| microkernel | layerd |
+| --- | --- |
+| 모듈화 | 모듈화 |
+| 더 유연함 | 밑에있는 레이어만 접근이 가능해서 밑의 level과 엮여있음 |
+
+### virtual Machine
+
+Virtural Machine
+
+본격적으로 클라우드 컴퓨팅을 사용하기 시작하면서 각광받기 시작함.
+
+![image](https://user-images.githubusercontent.com/74058047/226505829-a56d93f4-88d2-409d-95f7-7d3c7ad59b4c.png)
+
+사용률이 10%밖에 안 되는데 모두 사용하면서 낭비할 필요가 없으니, 쪼개서 사용하자는 idea에서 등장
+
+- 쪼개서 서로 다른 VM을 사용하고 서로 다른 OS 사용이 가능
+- 가상화 툴은 하드웨어와 운영체제를 VM입장에서 봤을때 hardware로만 인식하게끔하고 각각의 VM은 별도의 운영체제를 사용하도록한다.
+
+![image](https://user-images.githubusercontent.com/74058047/226505841-b54238fb-0612-4207-96ab-1d6b9706f881.png)
+
+**최적화**
+
+Before (베어메탈): 프로그램을 작동시키기 위해서 A를 최적화 시키면 B,C에 간섭이 일어나고 B,C는 최적화를 하지 못할 수 있었음
+
+After (VM): 각각의 가상머신 안에서 최적화를 진행해줘서 서로의 간섭현상이 일어나지 않는다.
+
+**하드웨어**
+
+다만 하드웨어는 물리적인 영역으로 하나만 존재한다.
+
+하지만, 가상머신들은 실제로는 그렇지 않지만 각자의 피지컬 영역을 가지고 있다고 생각함 : illusion
+
+**How? 어떻게 분리된것처럼 느낄 수 있게하나**
+
+1. CPU scheduling : cpu의 power를 (cpu 할당을) 나눠서 특정 VM에서만 사용하도록하여 CPU power를 분리한다.
+2. spooling(입출력에 해당하는 작업이 동시에 일어나도록 하는 기술) and filesystem : disk를 분리해서 (ex, c drive, d drive 분리하듯이) 각각에 할당
+3. operator’s console : 일반 사용자의 모니터를 이용. terminal server
+
+**protection**
+
+서로 독립적이여서 간섭하지 않고 영향을 받지 않는다.
+
+research and development 환경 등을 분리
+
+**단점**
+
+구현이 어려움
+
+### JVM : java virtual machine
+
+![image](https://user-images.githubusercontent.com/74058047/226505847-d0ac878b-3957-4030-b856-9112aaa16e65.png)
+
+- class loader는 외부, 내부 라이브러리 및 클래스를 사용
+- interpreter를 사용해서 한줄씩 번역. → 따라서 약간 느리다는 단점이 존재했지만 속도 향상 기능들이 나오기 시작
+
+### operating system  generation
+
+- SYSGEN : 하드웨어에 마우스가있는지 용량이 얼마나 있는지 등등의 필요한 정보를 모두 수집하는 역할
+- 정보를 ROM을 동작시키며 실행 : Bootstrap Program
+
+이후, 부팅이 필요한데 Bootstrap Program을 사용.
+
+ROM 안에 이미 다 저장이 되어있는데 cpu옆에 꽂혀있고 power가 들어오면 가장 먼저 ROM에 있는 것을 모두 실행 = Bootstrap Program이 동작함.
