@@ -25,12 +25,12 @@ value → 인코더 셀의 은닉상태들  ⇒ values : 인코터 셀의 모든
 
 ### 구조
 
-<img width="300" alt="image" src="https://user-images.githubusercontent.com/74058047/227697775-809b4846-31b6-45af-9cbe-9bbbb2abf03b.png">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/74058047/227697775-809b4846-31b6-45af-9cbe-9bbbb2abf03b.png">
 
 encoder, decoder사이의 RNN에서 필요한 context vector를 제외하여 과거 데이터의 기억에 있어서의 문제를 해결한다.<br>
 
 encoder, decoder는 각 파트에서 여러층이 쌓여서 만들어지고 하나의 encoder decoder에서는 attention이 수행되고 그 결과가 다음 층으로 넘어간다.<br>
-<img width="300" alt="image" src="https://user-images.githubusercontent.com/74058047/227697944-a319e111-2fd0-4a3d-a0c3-1bdaa6c4de5f.png"><br>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/74058047/227697944-a319e111-2fd0-4a3d-a0c3-1bdaa6c4de5f.png"><br>
 해당 그림처럼 Feed Forward가 진행되는데, 잔차연결 및 전처리 과정을 진행하고 잔차를 통해서 이전 레벨에 대한 input값을 같이 가져감으로써 신뢰성을 키워줄 수 있다.<br>
 
 
@@ -53,14 +53,14 @@ RNN과 달리 Trasformer는 각 단어가 어떤 순서를 가지는지에 대�
 
 > attention의 과정을 쪼개서 병렬처리 함으로써 차원을 줄여서 다양한 관점에서 정보를 수집하는 과정이다.
 
-<img width="200" alt="image" src="https://user-images.githubusercontent.com/74058047/227697412-a57c49b3-ed66-4648-a76e-66f38d5b25db.png">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/74058047/227697412-a57c49b3-ed66-4648-a76e-66f38d5b25db.png">
 
 
 - input vector와 query, key, value는 서로 dot product를 진행해야하니까 앞의 column size와 뒤의 row의 size는 동일해야한다는 특징을 가져야한다.
 
 <br>
 
-<img width="200" alt="image" src="https://user-images.githubusercontent.com/74058047/227697710-e516c2c9-5295-4b99-a787-a9af87dcc8a7.png"><br>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/74058047/227697710-e516c2c9-5295-4b99-a787-a9af87dcc8a7.png"><br>
 
 - 이후, 그림처럼 head를 쪼개서 나온 결과들을 모두 합쳐서 한번의 dot **product를 재진행해서 size를 처음과 동일하게 만들어주는 과정을 진행**(input값과 output값의 size가 동일해서 행렬덧셈연산이 가능)한다.<br>
 
@@ -72,8 +72,8 @@ RNN과 달리 Trasformer는 각 단어가 어떤 순서를 가지는지에 대�
 
 - 트랜스포머에서 서브층의 입력과 출력은 동일한 차원을 갖고 있으므로, 서브층의 입력과 서브층의 출력은 덧셈 연산이 가능하다.<br>
 
-    <img width="200" alt="image" src="https://user-images.githubusercontent.com/74058047/227698079-233ed3a8-2ee8-4f3c-8dea-8ac2e96730fd.png">
+    <img width="400" alt="image" src="https://user-images.githubusercontent.com/74058047/227698079-233ed3a8-2ee8-4f3c-8dea-8ac2e96730fd.png">
 
 - 평균, 분산을 활용해서 정규화를 진행한다.<br>
 
-    <img width="100" alt="image" src="https://user-images.githubusercontent.com/74058047/227698181-9a2bf0d7-dff0-4651-9bdd-136a9cfd802e.png">
+    <img width="400" alt="image" src="https://user-images.githubusercontent.com/74058047/227698181-9a2bf0d7-dff0-4651-9bdd-136a9cfd802e.png">
