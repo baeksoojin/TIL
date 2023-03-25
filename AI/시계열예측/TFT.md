@@ -39,8 +39,7 @@
 
 > 사용하지 않는 component를 skip하는 매커니즘
 
-![image](https://user-images.githubusercontent.com/74058047/227697062-289423ad-0e6e-4f6f-b604-27c6ee94de48.png)
-
+<img width="300" alt="image" src="https://user-images.githubusercontent.com/74058047/227698632-c848c31d-ad2d-40c3-8367-ffedc883c4ea.png">
 input값과 context vector(외부값)이 함께 들어가서 층 2개를 거쳐서 결국 GLU를 만나게 된다.
 
 GLU : 기여도를 조정하는데 **sigmoid**를 사용하고 따라서 사용할 것만 남기게 됨.
@@ -51,8 +50,7 @@ GLU : 기여도를 조정하는데 **sigmoid**를 사용하고 따라서 사용�
 
 > 예측에 기여하는 성분들은 선택하고 불필요한 Nosie 입력 변수들은 제거하는 방법
 
-![image](https://user-images.githubusercontent.com/74058047/227697096-849a0a72-3dce-4ba0-a285-6ce0f1f91f5c.png)
-
+<img width="433" alt="image" src="https://user-images.githubusercontent.com/74058047/227698639-af921ed0-c671-4674-a073-0e655fc83bf9.png">
 ⇒ input은 variable selection network를 거친다. 해당 network를 통해서 processed Feature를 산축하게 되는데 이를 통해서 Variable Importance를 산출하게 되고 이것은 Encoder, Decoder에 사용한다.
 
 ### Static covariate encoders
