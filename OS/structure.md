@@ -335,3 +335,137 @@ research and development 환경 등을 분리
 이후, 부팅이 필요한데 Bootstrap Program을 사용.
 
 ROM 안에 이미 다 저장이 되어있는데 cpu옆에 꽂혀있고 power가 들어오면 가장 먼저 ROM에 있는 것을 모두 실행 = Bootstrap Program이 동작함.
+
+
+---
+
+
+## InterProcess Communication (IPC)
+
+> 프로세스가 소통하고 동기화하는 방식
+> 
+
+- Message Passing : Send(설계시 고정할것인지 가변하게 할 것인지 고정), Receive
+    - communication을 위한 link가 있어야함.
+- communication link
+    - pysical(shared memory : 서로 공유하는 메모리를 읽고, 쓰고, bus, switch : cross bar switching 대표적, )
+    - logical(direct[무언가를 거치지 않고 바로 send, receive] or indirect[무언가를 통해서 send, receive], syn or async, auto(무한대) or explicit(한정적)buffer)
+
+- 고려사항
+1. link를 어떻게 설계해 둘 것인지
+2. 몇개를 연결시킬 것인지
+3. 얼마나 많은 link를 every pair 사이에 둘 것인지
+4. capacity of a link(bandwidth)
+5. message의 size를 고정시킬 것인지 아닌지
+6. 단방향 혹은 쌍방향
+
+## communication models
+
+- Message Passing vs Shared Memory
+
+Message Passing : kernel이 우체국처럼 동작하고 한쪽에서 쓰고(우체통에 넣기) 한쪽에서는 편지를 가져오는역할(빼기)
+
+Shared Memory : 사시에 공유된 영역을 두고 읽고 쓰는 방법
+
+---
+
+## Direct Communication
+
+직접 연결되는 경우
+
+다른것은 끼면 안 되고 바로 한 쌍끼리 서로 연결이 되어야한다.
+
+- 한 쌍 안에는 오직 하나의 path만 존재해야한다. (서로 얽혀있으면 안 되기 때문)
+- unidirectional 가능, 그러나 주로 bi-directional하다.
+
+## Indirect Communication
+
+mailbox를 사이에 두고 간접적으로 연결된 경우
+
+communication을 원하는 peer끼리 같은 mailbox를 공유하고 있어야한다.
+
+- mailbox를 통해서 가는데, unique한 id를 가져서 서로 중복되지 않는다.
+- p1, p2는 서로 공유하는 메일 박스만 존재하면 여러개의 Mailbox를 가질 수 있다.
+
+**Operation**
+
+- mailbox를 활용하는 과정
+
+mailbox를 create → send or receive → destroy mailbox
+
+**Primitives**
+
+- sned(A,message), receive(A, message)
+
+**Mailbox sharing and Solution**
+
+P1,P2 and P3 share mailbox A일때
+
+여러개가 붙어있어도 receive를 실행시킬 것은 하나이다.
+
+who gets the message ? → 하나를 선택해서 전달하고 누구한테 전달했는지 알려줘야함.
+
+---
+
+## Synchronization
+
+### Blocking
+
+**Blocking Send**
+
+Direct 성질. Send하고 Receive할때까지 Block된다.
+
+- 받는쪽이 받아갈때까지 보내는 operation을 계속 진행하며 blocking
+
+**Blocking Receive**
+
+Receive하려고 계속 Block 처리중인데 send하지 않아서 지속된다.
+
+- 보내는 쪽이 보낼때까지 operation을 계속 진행하며 blocking
+
+### Non-Blocking
+
+- asynchronous
+- 
+
+다른쪽의 action을 기다리지 않음. 
+
+그러기 위해서는 당연히 buffer가 필요함.
+
+## Buffering
+
+- Zero capacity : 서로 직접 연결이 되어 있어야 주고 받을 수 있는 경우로 blocking, synchronous(서로 동시에 연결되어있어야 서로 주고 받고가 일어남)
+- Bounded capacity : finite length of n message
+- Unbounded capacity : 절대 꽉찰일이 없어서 보내고 싶을때 보내고 받고 싶을때 받는경우로 non-blocking, asynchronous
+
+---
+
+## Client-Server Communication
+
+- Socket
+- Remote Procedure Calls = Remote Method Invocation(in Java)
+
+## Socket
+
+> 프로세스 간의 communication을 위한 최종단말로 endpoint
+> 
+
+- socket의 구성
+
+IP:PORT → sort
+
+서버끼리의 통신은 ip address와 port를 이용해서 원격으로 communication을 시작.
+
+- 몇개정도는 고정
+
+telnet : 23 port, ftp : 21 port
+
+## Remote Procedure Calls
+
+원격으로 다른쪽의 computer의 프로시저를 호출해서 결과를 넘겨받는 과정
+
+> Remote Procedure call : RPC
+> 
+
+- client-side stub : server에게 RPC의 address를 요청하고, 하고싶은 것을 진행한다음에 client에게 최종 결과 전송
+- server-side stub : 요청받은 RPC의 데이터를 전송해주고 output을 전송
