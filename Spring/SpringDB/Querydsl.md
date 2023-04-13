@@ -12,7 +12,7 @@ query를 문자가 아닌 java code로 작성해서 문법 오류를 컴파일 �
 
 ---
 
-## Querydsl을 어떻게 사용해야하나?
+## 1. Querydsl을 어떻게 사용해야하나? 기본을 알아보자.
 
 ### **프로젝트 환경 설정**부터 알아보자.
 
@@ -507,5 +507,340 @@ public void fetchJoinUse() throws Exception {
                     .otherwise("기타"))
             .from(member)
             .fetch();
+}
+```
+
+----- 
+
+## 2. 중급 문법을 알아보자
+
+## 프로젝션과 결과반환
+
+- projection 조회 1개
+
+```java
+@Test
+public void simpleProjection(){
+    List<String> result = queryFactory
+            .select(member.username)
+            .from(member)
+            .fetch();
+
+    for(int i=0; i<result.size(); i++){
+        Assertions.assertThat(result.get(i).getClass()).isEqualTo(String.class);
+    }
+
+}
+```
+
+- Projection이 여러개 → Tuple사용가능
+
+```java
+@Test
+public void tupleProjection(){
+    List<Tuple> result = queryFactory
+            .select(member.username, member.age)
+            .from(member)
+            .fetch();
+
+    for(int i=0; i<result.size(); i++){
+        //Assertions.assertThat(result.get(i).getClass()).isEqualTo(Tuple.class);
+        // -> Expected :com.querydsl.core.Tuple, but was: com.querydsl.core.types.QTuple.TupleImpl
+        Assertions.assertThat(result.get(i)).isInstanceOf(Tuple.class);
+    }
+
+}
+```
+
+### 만약, **Projection이 여러개라면? → DTO조회가능(4가지 존재)**
+
+1. property접근
+
+```java
+@Test
+public void findDtoBySetter(){
+    List<MemberDto> result = queryFactory
+            .select(Projections.bean(MemberDto.class,
+                    member.username,
+                    member.age))
+            .from(member)
+            .fetch();
+
+}
+```
+
+1. getter, setter없이 바로 필드에 값을 넣기
+
+```java
+@Test
+  public void findDtoByField(){
+      List<MemberDto> result = queryFactory
+              .select(Projections.fields(MemberDto.class,
+                      member.username,
+                      member.age))
+              .from(member)
+              .fetch();
+
+  }
+```
+
+private 필드인데 가능한것은 자바 라이브러리가 알아서 처리해주기때문에 가능하다.
+
+다만 이름이 맞지 않는다면 불러오지 못하게 된다.
+
+```java
+@Test
+public void findUserDtoByField() {
+    List<UserDto> result = queryFactory
+            .select(Projections.fields(UserDto.class,
+                    member.username,
+                    member.age))
+            .from(member)
+            .fetch();
+		for(int i=0; i<result.size(); i++){
+		            Assertions.assertThat(result.get(i).getName()).isNull();
+		        }
+
+}
+```
+
+```java
+member.username.as("name")으로 바꿀 수 있다.
+
+//Assertions.assertThat(result.get(i).getName()).isNotNull();
+```
+
+또한 subquery를 사용한 값을 projection value로 주고싶을때는 `alias`를 사용한다.
+
+```java
+@Test
+public void findUserDtoByField() {
+
+    QMember memberSub = new QMember("memberSub");
+    List<UserDto> result = queryFactory
+            .select(Projections.fields(UserDto.class,
+                    member.username.as("name"),
+                    ExpressionUtils.as(JPAExpressions
+                            .select(memberSub.age.max())
+                            .from(memberSub),"age")
+            ))
+            .from(member)
+            .fetch();
+
+    for(int i=0; i<result.size(); i++){
+        //Assertions.assertThat(result.get(i).getName()).isNull();
+        Assertions.assertThat(result.get(i).getName()).isNotNull();
+    }
+
+}
+```
+
+1. constructor
+
+```java
+@Test
+public void findDtoByConstructor(){
+    List<MemberDto> result = queryFactory
+            .select(Projections.constructor(MemberDto.class,
+                    member.username,
+                    member.age))
+            .from(member)
+            .fetch();
+}
+
+```
+
+다른 DTO를 가지고 member class를 select하려고 할때, name이 아닌 생성자를 보고 들어가기 때문에, 필드명을 바꿔주지 않아도된다.
+
+```java
+@Test
+public void findUserDtoByConstructor() {
+    List<UserDto> result = queryFactory
+            .select(Projections.constructor(UserDto.class,
+                    member.username,
+                    member.age))
+            .from(member)
+            .fetch();
+
+    for(int i=0; i< result.size(); i++){
+        Assertions.assertThat(result.get(i)).isInstanceOf(UserDto.class);
+    }
+
+}
+```
+
+1. annotation을 사용 - `@QueryProjection` 을 사용한다.
+
+```java
+@Data
+public class MemberDto {
+
+    private String username;
+    private int age;
+
+    public MemberDto() {
+    }
+
+    @QueryProjection
+    public MemberDto(String username, int age) {
+        this.username = username;
+        this.age = age;
+    }
+
+}
+```
+
+```java
+@Test
+public void findDtoByQueryProjection(){
+    MemberDto result = queryFactory
+            .select(new QMemberDto(member.username, member.age))
+            .from(member)
+            .limit(1)
+            .fetchOne();
+
+    Assertions.assertThat(result).isInstanceOf(MemberDto.class);
+
+}
+```
+
+다만 DTO가 querydto에 대한 의존성을 가지게 된다.
+
+DTO가 순수하게 작성되지 않는다는 단점도 존재할 수 있으니 항상 이러한 것을 생각하고 사용해야한다.
+
+## 동적쿼리 접근
+
+### BooleanBuilder()
+
+```java
+@Test
+@DisplayName("동적쿼리 테스트")
+public void dynamicQueryBooleanBuilder(){
+    String usernameParam = "member1";
+    Integer ageParam = 10;
+
+    List<Member> result = searchMember1(usernameParam, ageParam);
+    Assertions.assertThat(result.size()).isEqualTo(1);
+		Assertions.assertThat(result.get(0).getUsername()).isEqualTo("member1");
+
+}
+
+private List<Member> searchMember1(String usernameCond, Integer ageCond) {
+    BooleanBuilder builder = new BooleanBuilder();
+    if (usernameCond != null) {
+        builder.and(member.username.eq(usernameCond));
+    }
+    if (ageCond != null) {
+        builder.and(member.age.eq(ageCond));
+    }
+    return queryFactory
+            .selectFrom(member)
+            .where(builder)
+            .fetch();
+}
+```
+
+ageParam을 null로 하면? 
+
+```java
+if (ageCond != null) {
+      builder.and(member.age.eq(ageCond));
+  }
+```
+
+가 실행되지 않아서 age에 대한 조건을 먹히지 않음.
+
+- BooleanExpression을 사용해 where절에 바로 적용
+
+```java
+@Test
+@DisplayName("where parameter 동적쿼리 테스트")
+public void 동적쿼리_WhereParam() throws Exception {
+    String usernameParam = "member1";
+    Integer ageParam = 10;
+    List<Member> result = searchMember2(usernameParam, ageParam);
+    Assertions.assertThat(result.size()).isEqualTo(1);
+}
+private List<Member> searchMember2(String usernameCond, Integer ageCond) {
+    return queryFactory
+            .selectFrom(member)
+            .where(usernameEq(usernameCond), ageEq(ageCond))
+            .fetch();
+}
+
+private BooleanExpression usernameEq(String usernameCond) {
+    return usernameCond != null ? member.username.eq(usernameCond) : null;
+}
+private BooleanExpression ageEq(Integer ageCond) {
+    return ageCond != null ? member.age.eq(ageCond) : null;
+}
+```
+
+- usernameEq, ageEq로 별도의 메서드로 빼놓는것이 “재사용”하기에 좋다
+- **가능한 이유는 where에 `null`이있을때 무시할 수 있기 때문에 동적쿼리가 가능한 것이다.**
+
+### BULK 연산 - 수정, 삭제 배치쿼리
+
+쿼리 한번으로 대량 데이터를 수정
+
+다만, bulk연산의 경우 영속성 컨텍스트가 항상 우선권을 가져서 DB와 다른 값이 나올 수 있다.
+
+```java
+em.flush();
+em.clear();
+```
+
+를 통해서 영속성 컨텍스트를 날려줘야한다. 아래의 Testcode를 통해서 영속성 컨텍스트 주의점과 초기화를 알아보자!
+
+```java
+@Test
+@DisplayName("bulk 테스트")
+public void bulkUpdate(){
+
+    long count = queryFactory
+            .update(member)
+            .set(member.username, "비회원")
+            .where(member.age.lt(28))
+            .execute();
+
+    List<Member> noSetResult = queryFactory
+            .selectFrom(member)
+            .fetch();
+
+    for(int i=0; i<noSetResult.size(); i++){
+        if(noSetResult.get(i).getAge()<28){
+            Assertions.assertThat(noSetResult.get(i).getUsername()).isNotEqualTo("비회원");
+        }
+    }
+
+    **em.flush();
+    em.clear();**
+
+    List<Member> result = queryFactory
+            .selectFrom(member)
+            .fetch();
+
+    for(int i=0; i<result.size(); i++){
+        if(result.get(i).getAge()<28){
+            Assertions.assertThat(result.get(i).getUsername()).isEqualTo("비회원");
+        }
+  }
+}
+
+
+```
+### SQL function 호출
+
+- SQL function은 JPA와 같이 **Dialect**에 등록되어있어야 사용가능
+
+```java
+@Test
+@DisplayName("sql function 테스트")
+public void sqlFunction(){
+    String result = queryFactory
+            .select(Expressions.stringTemplate("function('**replace**', {0}, {1}, {2})", member.username, "member", "M"))
+            .from(member)
+            .fetchFirst();
+
 }
 ```
