@@ -294,3 +294,96 @@ process1이 TsetAndSet을 시켰는데 바로 다음에 **process2가 TestAndSet
     - **Bounded Waiting  조건 (X)**
         
         2개 이상의 프로세스 : if 4개였다면 lock이 False일 때 바뀌는데 기다리던 3개중에 랜덤(3개에 모두 기회를 준것이기에 순서를 보장하지 않음)으로 하나만 재수좋게 critical section에 들어간다. 따라서 보장은 시켜주지 않기에 Bounded 조건은 만족하지 않는다.
+
+## semaphore
+
+> 동기화를 위한 툴이며 busy waiting이 필요없는 특징이 있다.
+> 
+- busy waiting
+    
+    while → do nothing처리
+    
+- wait, signal
+    1. wait operation → s≤0 → while (do nothing)으로 entry() 처리
+    - 정의된 대로 의미상으로는 위와같고 실제로 구현될 때는 do nothing while문을 넣지 않아서 busy waiting이 적용되지 않는다.
+    1. signal operation → s++ logic으로 exit() 처리
+- signal과 wait을 사용하면 순서부여가 가능하다.
+    
+    signal CPU → interrupt를 막음.
+    
+    multiple CPU → spinlock( = wait and signal)을 사용.
+    
+
+### 고려사항
+
+critical section의 작업이 오랫동안 발생한다면 ? → 차라리 busy waiting을 하기보다 context switching을 하는게 낫다고 볼 수도 있음.(waiting queue에서 기다리던 process를 가져오는 처리)
+
+만약 critical section의 코드가 짧거나 가끔 발생하는 operation이라면 ? → busy waiting 방식이 더 좋을 수 있음.
+
+## semaphore Implementation
+
+- waiting : queue에 넣어 block처리 : Entry section
+    - block이 된 프로세스들이 기다리는 큐
+    - code
+- signal : Exit Section
+    - wakeup → queue에서 가져오는(remove) 처리 이후 동작
+- value → 1로 시작해서 처음 동작때는 block되지 않음
+
+### Deadlock and Starvation
+
+- Deadlock
+    - 2개의 프로세스가 동시에 Lock이 되어 아무것도 실행되지 못하는 상태를 Deadlock 상태라고한다.
+    - Starvation문제가 발생할수있다.
+
+---
+
+## 동기화의 고전적인 문제들
+
+### Bounded-Buffer Problem → starvation관련문제
+
+empty : 초기값은 n으로 버퍼에 남은 값이 들어있음
+
+mutex : 1로 시작 (≤0일때 block되지 않고 critical section에 들어감)
+
+full : 초기값은 0으로 버퍼에 차있는 공간의 개수가 들어있음.
+
+- consumer와 producer사이의 semaphore
+
+![image](https://user-images.githubusercontent.com/74058047/236987706-3689e6ea-e7a5-472f-b6b8-826e8cc897fd.png)
+
+
+버퍼의 개수가 3일때
+
+pppp —-(1)
+
+cccc ——(2)일때 “(1) → (2)” 가 진행된다면?
+
+마지막 operation에서는 buffer공간 full=3 & empty=0이기에 wait(empty)에 걸려서 producer는 쓰지 못하지만 consumer가 signal(empty)를 처리하게 된다면 그때 producer의 p가 동작할수있다.
+
+---
+
+## Synchronization Examples
+
+- Solaris → adaptive mutex
+    - 실행중이던 porcess이며 critical section이 짧다면 busy waiting(spin)을 사용
+    - cpu가 하나일때는 다른 작업은 sleep상태로(queue에 넣어서 기다리기)
+    - lock을 사용해서 데이터를 읽고(여러개 가능) 쓰기(하나만 가능)를 제어
+    - turnstiles(놀이공원 회전문 기법)를 사용해서 줄 세우기를 사용.
+
+- Window Xp
+    
+    CPU가 하나 → interrupt를 사용
+    
+    CPU가 여러개 → busy waiting인 spin lock을 사용
+    
+    dispatcher → semaphore와 같이 동작하는 방법
+    
+- Linux
+    
+    critical section이 짧다 → interrupt
+    
+    single cpu → preemption or nonperrmption으로 intrerrupt를 제어
+    
+- Pthread
+    
+    Non-portable → read-write locks/ spin locks
