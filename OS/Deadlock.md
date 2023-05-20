@@ -135,3 +135,99 @@ why? 순서가 정해져있기 때문에 성립이 가능함. → **Safe Sequenc
 - Assgin edge
 
 request 때문에 실제로 할당된 상태
+
+## Banker’s Algorithm
+
+- Multiple instance
+- maximun use를 미리 요청
+- wait & return 성질
+
+### 자료구조
+
+Avaliable : 여유분
+
+Max : Max[i,j] = K 일때 Pi의 i마다 Rj를 할당받아서 최대 K개
+
+Allocation : 이미 할당된 자원
+
+Need : Max에서 Allocation을 뺀 값으로 최대치에서 이미 할당된 자원을 뺀 값
+
+### safety Algorithm
+
+work : 현재 시점에서 자원의 여유분 수
+
+finish : false - 실행되면 true로 변화됨
+
+만약 finish[i]가 모든 i에 의해서 true가 나온다면 safe 상태에 있다는 것이고 false가 지속된다면 deadlock의 가능성이 존재한다.
+
+프로세스를 빌려주면 다시 반납받고 그 때 프로세스가 할당중이였던 자원역시 같이 반납되어 work는 allocation까지 더한 값으로 변경된다.
+
+---
+
+## Resource-Request Algorithm
+
+- Request(요청)하고 있는 자원의 개수가 Need보다 작거나 같은지 체크
+- Request(요청)하고 있는 자원의 개수가 Avaliable보다 작거나 같은지 체크
+- Pretend
+    
+    자원을 할당했다고 가정.
+    
+    가정한 상태에서의 Avaliable, Allocation, Need를 구해서 safety 알고리즘을 적용해서 safe로 나오면 유지하고 아니면 되돌리는 방식을 취한다.
+    
+---
+
+## Deadlock Detection
+
+### Wait-For Graph
+
+연결된 자원을 제거하고 process에서 process가 연결되도록 그리는 그래프
+
+이때 instance가 하나였다면? 사이클이 있을 때 deadlock에 빠진 상태가 된다.
+
+### Detection Algorithm
+
+work : 여유분
+
+finish = false : Allcation≠0인 상태로 자원을 아직 가지고 있어서 아직 프로세스가 종료되지 않은 상태
+
+- finish가 false라면(안 끝난 프로세스) 중에서 request ≤ work 를 찾고 자원을 빌려줬다가 다시 반납받는 과정을 반복한다.(프로세스 종료시 work = work+Allocation이 됨)
+- finish가 false라면 deadlock상태에 관여된 프로세스가 있다는 것이고 false인 프로세스가 데드락에 관여한 프로세스이다.
+
+
+### Issue
+
+- 언제 얼마나 자주 사용하는가?
+    
+    얼마나 자주 Deadlock이 발생할 것 같은지를 체크한다.
+    
+- 얼마나 많은 프로세스가 데드락에 관여하는가?
+    
+    얼마나 많은 프로세스가 관여할 수 있는지를 체크한다.
+    
+
+위의 2가지를 체크하고 deadlock이 발생되는 사이클을 체크하며 필요할 때만 알고리즘을 돌린다.
+
+요인을 먼저 확보하고 deadlock 알고리즘을 적용시킨다.
+
+만약 그렇지 안흥면 어떤 것이 처음에 데드락을 발생시켰는지 알기 어려워진다.
+
+### 빠져나오는 방법
+
+- 종료(terminate되어 자원이 반납된다)
+- 회수(process가 가지고 있는 자원을 뺏어온다) - 종료만 안 시켰을 뿐 자원반납은 동일
+
+종료의 기준은?
+
+1. **우선순위**를 보고 결정
+2. 프로세스가 얼마나 많은 작업을 **해왔고** 앞으로 **남은 작업**이 얼마나 존재하는지를 보고 결정
+3. 프로세스가 사용하고 있는 **자원의 양**을 척도로 하여 결정
+4. **종료할 때**까지 얼마나 많은 **자원이 필요**한가에 따라서 결정
+5. **interactive(**종료시켜도 부담이 별로없음)한 성격인지 **batch**(이미 많은 작업을 처리했을 가능성이 큼)한지에 따라서 결정
+
+### Preemption
+
+자원을 뺏어오는 방법인데 희생양을 선택해야한다.
+
+1. cost가 최소
+2. rollback - safe한 상태로 만들고 강제로 종료시켰던 것을 다시 시작
+3. starvation - 최대 몇번이상은 희생양이 안 된다는 것을 정해놔야 starvation 문제를 해결할 수 있을 것임.
