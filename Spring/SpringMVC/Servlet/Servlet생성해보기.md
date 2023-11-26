@@ -1,4 +1,4 @@
-# Springboot에서의 Servelt실행 이해하기
+# Springboot에서의 Servlet실행 이해하기
 
 ## Springboot Servlet 환경 구성
 
