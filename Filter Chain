@@ -1,0 +1,16 @@
+## Spring security
+
+
+### Filter Chain의 동작과정
+
+1. 서블릿 컨테이너 초기화: 서블릿 컨테이너가 시작되면서 ServletContainerInitializer가 호출되고, 이를 통해 SpringServletContainerInitializer가 등록됩니다. SpringServletContainerInitializer는 스프링 애플리케이션 컨텍스트를 설정하는 역할을 합니다.
+
+2. DispatcherServlet 초기화: DispatcherServlet은 일반적으로 애플리케이션의 진입점으로 설정되며, 서블릿 컨테이너가 애플리케이션을 로드할 때 초기화됩니다. DispatcherServlet은 스프링 웹 애플리케이션 컨텍스트를 설정하고, 요청을 받아서 처리할 준비를 합니다.
+
+3. FilterChain 생성: 스프링 Security는 FilterChainProxy를 사용하여 여러 보안 필터를 연결한 FilterChain을 생성합니다. 이 FilterChain은 보통 Spring Security 필터들뿐만 아니라 사용자가 정의한 필터들도 포함할 수 있습니다.
+
+4. FilterChain 실행: 클라이언트의 요청이 서버에 도달하면, FilterChainProxy를 통해 생성된 FilterChain이 실행됩니다. 각각의 필터는 요청 및 응답 객체에 대한 작업을 수행하며, 보안 관련된 작업을 담당합니다. 이는 예를 들면 사용자의 인증, 권한 부여, CSRF 공격 방어 등이 있습니다.
+
+5. DispatcherServlet 호출: FilterChain을 통과한 요청은 DispatcherServlet으로 전달됩니다. DispatcherServlet은 알맞은 컨트롤러를 찾아 실행하고, 뷰를 렌더링하여 응답을 생성합니다.
+
+6. 서블릿 컨테이너에서 응답 반환: DispatcherServlet이 작업을 완료하면, 서블릿 컨테이너는 최종적인 응답을 클라이언트로 반환합니다.
